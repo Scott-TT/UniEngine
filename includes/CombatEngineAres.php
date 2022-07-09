@@ -18,6 +18,17 @@ include($_EnginePath . 'includes/ares/evaluators.php');
 
 use UniEngine\Engine\Includes\Ares;
 
+function shuffle_forces($list) { 
+    if (!is_array($list)) return $list; 
+    $keys = array_keys($list); 
+    shuffle($keys); 
+    $random = array(); 
+    foreach ($keys as $key) { 
+        $random[$key] = $list[$key]; 
+    }
+    return $random; 
+}
+
 function Combat($Attacker, $Defender, $AttackerTech, $DefenderTech, $UseRapidFire = true) {
     $Rounds = array();
     $AtkLoseCount = array();
@@ -230,7 +241,6 @@ function Combat($Attacker, $Defender, $AttackerTech, $DefenderTech, $UseRapidFir
         // ------------------------------------------------------------------------------------------------------------------------------------
         // Calculate Attacker(s) Part
         // 1. Let's calculate all regular fires!
-
         foreach($AtkShipsForce as $AKey => $AForce)
         {
             if($AForce == 0)
@@ -249,7 +259,7 @@ function Combat($Attacker, $Defender, $AttackerTech, $DefenderTech, $UseRapidFir
 
             // -----------------------
             // Calculate Regular Fire!
-            foreach($DefShipsForce_Copy as $TKey => $TForce)
+            foreach(shuffle_forces($DefShipsForce_Copy) as $TKey => $TForce)
             {
                 $Temp = explode('|', $TKey);
                 $TShip = $Temp[0];
@@ -717,7 +727,7 @@ function Combat($Attacker, $Defender, $AttackerTech, $DefenderTech, $UseRapidFir
 
             // -----------------------
             // Calculate Regular Fire!
-            foreach($AtkShipsForce_Copy as $TKey => $TForce)
+            foreach(shuffle_forces($AtkShipsForce_Copy) as $TKey => $TForce)
             {
                 $Temp = explode('|', $TKey);
                 $TShip = $Temp[0];
