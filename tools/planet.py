@@ -2,8 +2,10 @@ import random
 import randomname
 import math
 import time
-
 import pprint
+
+import economy_config
+import planet_item
 import planet_scaling
 
 class Planet:
@@ -27,8 +29,20 @@ class Planet:
         self.init_geo()
         self.init_buildings()
         self.init_resources_values()
+        
 
-    def init_resources_values(self): 
+    def init_resources_values(self):
+        # Hourly income computation
+        self.parameters["metal_perhour"]     = 30 * economy_config.production_multiplier * self.parameters["metal_mine"]**1.1
+        self.parameters["crystal_perhour"]   = 20 * economy_config.production_multiplier * self.parameters["crystal_mine"]**1.1
+        self.parameters["deuterium_perhour"] = 12 * economy_config.production_multiplier * self.parameters["deuterium_synthesizer"]**1.1
+
+        # Initial stock of one week worth of production
+        self.parameters["metal"]     = self.parameters["metal_perhour"] * 24*7
+        self.parameters["crystal"]   = self.parameters["crystal_perhour"] * 24*7
+        self.parameters["deuterium"] = self.parameters["deuterium_perhour"] * 24*7
+
+        # Compute and apply maximum storage capacity
         self.parameters["metal_max"] = 100000 + 5000 * ( 2.5 * math.exp(20/33 * self.parameters["metal_storage"]))
         self.parameters["metal"] = min(self.parameters["metal"], self.parameters["metal_max"])
         self.parameters["crystal_max"] = 100000 + 5000 * ( 2.5 * math.exp(20/33 * self.parameters["crystal_storage"]))
@@ -40,8 +54,8 @@ class Planet:
         self.parameters = { **self.parameters, **self.generator.generate_planet_buildings(self.distance) }
     
     def print_defenses_and_fleets (self):
-        ships = {k:v for k,v in self.parameters.items() if k in planet_scaling.DefenseConfig.fleets }
-        defenses = {k:v for k,v in self.parameters.items() if k in planet_scaling.DefenseConfig.buildings }
+        ships = {k:v for k,v in self.parameters.items() if k in planet_item.fleets }
+        defenses = {k:v for k,v in self.parameters.items() if k in planet_item.buildings }
         print()
         if True:
             print("Ships:")

@@ -1,4 +1,5 @@
 import math
+import economy_config
 
 class Research:
     def __init__(self, metal, crystal, deut, dependencies=None):
@@ -19,6 +20,11 @@ class Research:
                     total_cost += (all_techs[dep_tech].get_total_cost(dep_level))[r]
             cost[r] = total_cost
         return cost
+
+    def get_simplified_cost(self, level):
+        cost = self.get_total_cost(level)
+        return cost["metal"]*economy_config.metal_cost_ratio + cost["crystal"]*economy_config.crystal_cost_ratio + cost["deut"]*economy_config.deut_cost_ratio
+
 
 all_techs = {
      "espionage" : Research(200, 1000, 200)
