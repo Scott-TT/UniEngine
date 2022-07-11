@@ -67,10 +67,10 @@ def populate_everything(depopulate=True, coordinates_blacklist=[]):
         populate_galaxy(galaxy=i, coordinates_blacklist=coordinates_blacklist)
 
 #populate_everything(coordinates_blacklist=retrieve_existing_planets_coordinates())
-for i in range(1,10,5):
+for i in range(10):
     print("\n--Galaxy %d--"%i)
-    p = Planet(i,250,8)
-    p.print_defenses_and_fleets()
+    p = Planet(i,10,8)
+    p.print_debug()
 
 cursor.close()                          
 cnx.commit()

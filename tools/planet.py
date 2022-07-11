@@ -25,7 +25,7 @@ class Planet:
         }
         self.generator = planet_scaling.PlanetScaling()
         self.planet = planet
-        self.distance = max(0, system + (galaxy-1)*500)
+        self.scaling_level = self.generator.compute_scaling_factor(planet=self)
         self.init_geo()
         self.init_buildings()
         self.init_resources_values()
@@ -51,18 +51,28 @@ class Planet:
         self.parameters["deuterium"] = min(self.parameters["deuterium"], self.parameters["deuterium_max"])
   
     def init_buildings(self):
-        self.parameters = { **self.parameters, **self.generator.generate_planet_buildings(self.distance) }
-    
-    def print_defenses_and_fleets (self):
+        self.parameters = { **self.parameters, **self.generator.generate_planet_buildings(self.scaling_level) }
+
+    def print_debug (self, display_fleet=False, display_defenses=False):
+        scale = planet_scaling.PlanetScaling()
         ships = {k:v for k,v in self.parameters.items() if k in planet_item.fleets }
         defenses = {k:v for k,v in self.parameters.items() if k in planet_item.buildings }
-        print()
-        if True:
+        print("Scaling factor of (%d,%d,%d) : %f" % (self.parameters["galaxy"],self.parameters["system"],self.parameters["planet"]
+                                                    ,scale.compute_scaling_factor(linear_scaling_level=self.scaling_level)))
+        if display_fleet:
             print("Ships:")
-            pprint.pprint(ships)
-        if True:
+            #pprint.pprint(ships)
+            cost = 0
+            for type, quantity in ships.items():
+                cost += planet_item.fleets[type].total_cost() * quantity
+            print("  Total cost : %s" % f"{cost:,}")
+        if display_defenses:
             print("\nDefenses:")
-            pprint.pprint(defenses)
+            #pprint.pprint(defenses)
+            cost = 0
+            for type, quantity in defenses.items():
+                cost += planet_item.buildings[type].total_cost() * quantity
+            print("  Total cost : %s" % f"{cost:,}")
   
     def init_geo(self):
         # sizes

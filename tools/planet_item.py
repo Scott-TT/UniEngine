@@ -25,6 +25,12 @@ class PlanetItem:
             cost += research.all_techs[tech_type].get_simplified_cost(tech_level)
         return math.floor(cost)
 
+    def simplified_cost(self):
+        return self.juice
+
+    def total_cost(self):
+        return self.metal + self.crystal + self.deut
+
 
 buildings = {
     "rocket_launcher"        : PlanetItem(metal=2000  ,crystal=0     ,deut=0     ,maximum_quantity=None)
