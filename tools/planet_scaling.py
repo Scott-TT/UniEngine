@@ -10,7 +10,6 @@ class PlanetScaling:
         if config == None:
             self.config = {
                 "universe_production_multiplier": economy_config.production_multiplier
-                ,"scaling_level_max"            : 7*500 # Currently distance to 1:1:1
                 ,"level_mines_min"              : 6
                 ,"level_mines_max"              : 40
                 ,"level_storage_min"            : 0
