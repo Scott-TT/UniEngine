@@ -2,31 +2,43 @@ import random
 import math
 import time
 
+metal_cost_ratio = 1
+crystal_cost_ratio = 1.5
+deut_cost_ratio = 2.5
+
+class DefenseItem:
+    def __init__(self, metal, crystal, deut, maximum_quantity=None):
+        self.metal = metal
+        self.crystal = crystal
+        self.deut = deut
+        self.maximum_quantity = maximum_quantity
+        self.juice = math.floor(metal*metal_cost_ratio + crystal*crystal_cost_ratio + deut*deut_cost_ratio)
+
 class DefenseConfig:
   buildings = {
-     "rocket_launcher"       : 2000
-    ,"light_laser"           : 2000
-    ,"heavy_laser"           : 8000     
-    ,"gauss_cannon"          : 37000
-    ,"ion_cannon"            : 8000   
-    ,"plasma_turret"         : 130000
-    ,"small_shield_dome"     : 20000
-    ,"large_shield_dome"     : 100000
-    ,"antiballistic_missile" : 10000 
+     "rocket_launcher"       : DefenseItem(metal=2000  ,crystal=0     ,deut=0     ,maximum_quantity=None)
+    ,"light_laser"           : DefenseItem(metal=1500  ,crystal=500   ,deut=0     ,maximum_quantity=None)
+    ,"heavy_laser"           : DefenseItem(metal=6000  ,crystal=2000  ,deut=0     ,maximum_quantity=None)     
+    ,"gauss_cannon"          : DefenseItem(metal=20000 ,crystal=15000 ,deut=2000  ,maximum_quantity=None)
+    ,"ion_cannon"            : DefenseItem(metal=3000  ,crystal=5000  ,deut=0     ,maximum_quantity=None)   
+    ,"plasma_turret"         : DefenseItem(metal=50000 ,crystal=50000 ,deut=30000 ,maximum_quantity=None)
+    ,"small_shield_dome"     : DefenseItem(metal=10000 ,crystal=10000 ,deut=0     ,maximum_quantity=1)
+    ,"large_shield_dome"     : DefenseItem(metal=50000 ,crystal=50000 ,deut=0     ,maximum_quantity=1)
+    ,"antiballistic_missile" : DefenseItem(metal=12500 ,crystal=2500  ,deut=10000 ,maximum_quantity=300) 
   }
   
   fleets = {
-     "small_cargo_ship" : 4000       * 0.5
-    ,"big_cargo_ship"   : 12000      
-    ,"light_fighter"    : 4000       * 0.5
-    ,"heavy_fighter"    : 10000
-    ,"cruiser"          : 27000
-    ,"battleship"       : 60000 
-    ,"battlecruiser"    : 90000
-    ,"recycler"         : 20000
-    ,"bomber"           : 90000
-    ,"destroyer"        : 125000
-    ,"deathstar"        : 10000000
+     "small_cargo_ship" : DefenseItem(metal=2000    ,crystal=2000    ,deut=0       )
+    ,"big_cargo_ship"   : DefenseItem(metal=6000    ,crystal=6000    ,deut=0       )      
+    ,"light_fighter"    : DefenseItem(metal=3000    ,crystal=1000    ,deut=0       )
+    ,"heavy_fighter"    : DefenseItem(metal=6000    ,crystal=4000    ,deut=0       )
+    ,"cruiser"          : DefenseItem(metal=20000   ,crystal=7000    ,deut=2000    )
+    ,"battleship"       : DefenseItem(metal=45000   ,crystal=15000   ,deut=0       ) 
+    ,"battlecruiser"    : DefenseItem(metal=30000   ,crystal=40000   ,deut=15000   )
+    ,"recycler"         : DefenseItem(metal=10000   ,crystal=6000    ,deut=2000    )
+    ,"bomber"           : DefenseItem(metal=50000   ,crystal=25000   ,deut=15000   )
+    ,"destroyer"        : DefenseItem(metal=60000   ,crystal=50000   ,deut=15000   )
+    ,"deathstar"        : DefenseItem(metal=5000000 ,crystal=4000000 ,deut=1000000 )
   }
 
 class PlanetScaling:
@@ -95,22 +107,22 @@ class PlanetScaling:
       
         # Static defenses
         defense_juice = self.compute_planet_juice(distance, planet) * random.randint(40,100)/100 # Not everyone builds defenses
-        defense_buildings = {k: v for k,v in DefenseConfig.buildings.items() if v < defense_juice }
+        defense_buildings = {k: v for k,v in DefenseConfig.buildings.items() if v.juice < defense_juice }
         total_value_per_item = defense_juice / max(1,len(defense_buildings))
         for k,v in defense_buildings.items():
-            quantity = math.floor(total_value_per_item / v * random.randint(50,200)/100)
-            if k in ["small_shield_dome","large_shield_dome"]:
-                quantity = min(1,quantity)
+            quantity = math.floor(total_value_per_item / v.juice * random.randint(50,200)/100)
+            if v.maximum_quantity:
+                quantity = min(v.maximum_quantity,quantity)
             if quantity > 0:
                 planet[k] = quantity
       
       
         # Fleets
         fleet_juice = self.compute_planet_juice(distance, planet)# 
-        fleet_ships = {k: v for k,v in DefenseConfig.fleets.items() if v < fleet_juice }
+        fleet_ships = {k: v for k,v in DefenseConfig.fleets.items() if v.juice < fleet_juice }
         total_value_per_item = fleet_juice / max(1,len(fleet_ships))
         for k,v in fleet_ships.items():
-            quantity = math.floor(total_value_per_item / v * random.gauss(80,20) / 100)
+            quantity = math.floor(total_value_per_item / v.juice * random.gauss(80,20) / 100)
             if quantity > 0:
                 planet[k] = quantity
     

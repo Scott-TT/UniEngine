@@ -5,5 +5,5 @@ class database_config:
         self.host = host
         self.database = database
 
-default_config = database_config(user="user", password="password", host="localhost", database="my_db")
+default_config = database_config(user="ogameuser", password="plop", host="localhost", database="uniengine")
 

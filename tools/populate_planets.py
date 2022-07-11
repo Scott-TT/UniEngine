@@ -25,8 +25,7 @@ def retrieve_existing_planets_coordinates():
 
 def insert_planet(p, existing_planets): 
     if (p.parameters["galaxy"], p.parameters["system"], p.parameters["planet"]) in existing_planets:
-        print("Returning to avoid collision at (%d,%d,%d)" % (p.parameters["galaxy"], p.parameters["system"], p.parameters["planet"]))
-    return
+        return
   
     # Actual planet insertion
     values_placeholder = ', '.join(['%s'] * len(p.parameters))
@@ -68,8 +67,10 @@ def populate_everything(depopulate=True, coordinates_blacklist=[]):
         populate_galaxy(galaxy=i, coordinates_blacklist=coordinates_blacklist)
 
 #populate_everything(coordinates_blacklist=retrieve_existing_planets_coordinates())
-p = Planet(1,2,3)
-p.print_defenses_and_fleets()
+for i in range(10):
+    print("\n--Galaxy %d--"%i)
+    p = Planet(4,250,8)
+    p.print_defenses_and_fleets()
 
 cursor.close()                          
 cnx.commit()
