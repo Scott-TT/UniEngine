@@ -12,6 +12,10 @@ class PopulatePlayers():
     def __init__(self, cursor):
         self.cursor = cursor
 
+    def cleanup_db(self):
+        sql = "DELETE FROM _users WHERE isAI=1"
+        self.cursor.execute(sql)
+
     def insert(self, player):
         player_db = { "username": player.name
                      ,"password": ''.join(random.choice(string.ascii_letters) for i in range(20))
@@ -26,7 +30,6 @@ class PopulatePlayers():
                      ,"current_page": "/UniEngine/buildings.php"
                      ,"skinpath": ""
                      ,"settings_FleetColors": ""
-                     # tech_$tech
                      ,"ally_request_text":""
                      ,"activation_code":""
                      ,"new_pass":""
@@ -44,3 +47,9 @@ class PopulatePlayers():
         columns = ', '.join(player_db.keys())
         sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % ("_users  ", columns, values_placeholder)
         self.cursor.execute(sql, list(player_db.values()))
+
+    def populate_players(self):
+        self.cleanup_db()
+        for p in player_scaling.all_players:
+            self.insert(p)
+            p.id = self.cursor.lastrowid

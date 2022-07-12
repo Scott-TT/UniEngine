@@ -27,7 +27,7 @@ class PlanetScaling:
     def compute_scaling_factor(self, planet=None, linear_scaling_level=None, mode=None):
         linear_scaling = 0
         if linear_scaling_level == None:
-            linear_scaling = planet.parameters["galaxy"]*10 + planet.parameters["system"]*20/500 + random.gauss(0,5)
+            linear_scaling = (planet.parameters["galaxy"]-1)*10 + planet.parameters["system"]*20/500 + random.gauss(0,5)
             linear_scaling /= 100
         else:
             linear_scaling = linear_scaling_level

@@ -6,7 +6,6 @@ import time
 import pprint
 
 from planet import Planet
-from planet_scaling import PlanetScaling
 
 class PopulatePlanets():
 
@@ -46,14 +45,10 @@ class PopulatePlanets():
         sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % ("_galaxy", columns, values_placeholder)
         self.cursor.execute(sql, list(galaxy_entry.values()))
   
-  
-    def depopulate_everything(self, confirm=False):
-        if confirm == False:
-            print("Refusing to depopulation due to lack of confirmation")
-            return
-        sql="DELETE FROM _planets WHERE id > 2 AND id_owner=2"
+    def depopulate_everything(self, depopulate_clause):
+        sql=f"DELETE FROM _planets {depopulate_clause}"
         self.cursor.execute(sql)
-        sql="DELETE FROM _galaxy WHERE galaxy_id>2 AND id_planet NOT IN (SELECT id from _planets)"
+        sql="DELETE FROM _galaxy WHERE id_planet NOT IN (SELECT id from _planets)"
         self.cursor.execute(sql)
   
     def populate_system(self, galaxy, system):
@@ -66,8 +61,7 @@ class PopulatePlanets():
         for i in range(1,500):
             self.populate_system(galaxy=galaxy, system=i)
 
-    def populate_everything(self, depopulate=True):
-        if depopulate:
-            self.depopulate_everything()
+    def populate_everything(self, depopulate_clause="WHERE id < 0"):
+        self.depopulate_everything(depopulate_clause)
         for i in range(1,10):
             self.populate_galaxy(galaxy=i)

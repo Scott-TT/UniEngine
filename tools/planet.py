@@ -2,18 +2,20 @@ import random
 import randomname
 import math
 import time
-import pprint
+
+from pprint import pprint
 
 import economy_config
 import planet_item
 import planet_scaling
+import player_scaling
 
 class Planet:
 
-    def __init__(self, galaxy, system, planet):
+    def __init__(self, galaxy, system, planet, owner_id=None):
         self.parameters = {
             "Name" : randomname.get_name()
-            ,"id_owner" : 2
+            #,"id_owner" : 2
             ,"galaxy" : galaxy
             ,"system" : system
             ,"planet" : planet
@@ -29,7 +31,16 @@ class Planet:
         self.init_geo()
         self.init_buildings()
         self.init_resources_values()
-        
+        if owner_id == None:
+            players = player_scaling.PlayerScaling()
+            planet_juice = self.generator.compute_planet_juice(scaling_level=self.scaling_level, planet=self.parameters)
+            new_owner = players.get_suitable_player(target=planet_juice)
+            self.assign_to_player(new_owner.id)
+        else:
+            self.assign_to_player(owner_id)
+
+    def assign_to_player(self, user_id):
+        self.parameters["id_owner"] = user_id
 
     def init_resources_values(self):
         # Hourly income computation
