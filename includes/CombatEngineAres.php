@@ -18,15 +18,42 @@ include($_EnginePath . 'includes/ares/evaluators.php');
 
 use UniEngine\Engine\Includes\Ares;
 
-function shuffle_forces($list) { 
-    if (!is_array($list)) return $list; 
-    $keys = array_keys($list); 
-    shuffle($keys); 
-    $random = array(); 
-    foreach ($keys as $key) { 
-        $random[$key] = $list[$key]; 
+function shuffle_forces($Force,$ShipCounts) { 
+    if (!is_array($Force)) return $Force;
+
+    $force_to_weight = [] ;
+    $total_weight = 0 ;
+    foreach($Force as $TKey => $TForce)
+    {
+        $Temp = explode('|', $TKey);
+        $TShip = $Temp[0];
+        $TUser = $Temp[1];
+        $force_to_weight[$TKey] = $ShipCounts[$TShip][$TUser];
+        $total_weight += $force_to_weight[$TKey];
     }
-    return $random; 
+    
+    if ($total_weight == 0){
+        return $Force ;
+    }
+
+    arsort($force_to_weight);
+
+    $ordered_keys = array();
+    while($total_weight > 0){
+        $lookup_value = rand(1,$total_weight) ;
+        $current_weight = 0;
+        foreach($force_to_weight as $key=>$weight){
+            $current_weight += $weight;
+            if ($current_weight >= $lookup_value) {
+                $result[$key] = $Force[$key] ;
+                $force_to_weight[$key] = 0 ; // Never again
+                $total_weight -= $weight ;
+                break ;
+            }
+        }
+    }
+
+    return $result; 
 }
 
 function Combat($Attacker, $Defender, $AttackerTech, $DefenderTech, $UseRapidFire = true) {
@@ -259,7 +286,7 @@ function Combat($Attacker, $Defender, $AttackerTech, $DefenderTech, $UseRapidFir
 
             // -----------------------
             // Calculate Regular Fire!
-            foreach(shuffle_forces($DefShipsForce_Copy) as $TKey => $TForce)
+            foreach(shuffle_forces($DefShipsForce_Copy,$DefShipsTypesCount) as $TKey => $TForce)
             {
                 $Temp = explode('|', $TKey);
                 $TShip = $Temp[0];
@@ -727,7 +754,7 @@ function Combat($Attacker, $Defender, $AttackerTech, $DefenderTech, $UseRapidFir
 
             // -----------------------
             // Calculate Regular Fire!
-            foreach(shuffle_forces($AtkShipsForce_Copy) as $TKey => $TForce)
+            foreach(shuffle_forces($AtkShipsForce_Copy, $AtkShipsTypesCount) as $TKey => $TForce)
             {
                 $Temp = explode('|', $TKey);
                 $TShip = $Temp[0];
