@@ -14,9 +14,10 @@ class PlanetScaling:
                 ,"level_mines_max"              : 40
                 ,"level_storage_min"            : 0
                 ,"level_storage_max"            : 20
-                ,"fleet_on_planet_proba"        : (lambda : random.randint(0,100) < 20)
-                ,"fleet_worth_multiplier"       : (lambda : random.randint(20,100)/100)
-                ,"defenses_worth_multiplier"    : (lambda : random.randint(40,100)/100)
+                ,"linear_to_exponential_scaling": (lambda x: x * math.exp(2*(math.pow(x,2)-1)))
+                ,"fleet_on_planet_proba"        : (lambda x: random.randint(0,100) < 40-3*x)
+                ,"fleet_worth_multiplier"       : (lambda  : random.randint(20,100)/100)
+                ,"defenses_worth_multiplier"    : (lambda  : random.randint(40,100)/100)
             }
 
     def compute_scaling_factor(self, planet=None, linear_scaling_level=None, mode=None):
@@ -31,8 +32,7 @@ class PlanetScaling:
         if mode == None or mode == "linear":
             result = linear_scaling
         elif mode == "exponential":
-            x = linear_scaling
-            result = x * math.exp(2.1*(math.pow(x,2)-1))
+            result = self.config["linear_to_exponential_scaling"](linear_scaling)
 
         return min(1,max(0,result))
     
@@ -69,7 +69,7 @@ class PlanetScaling:
                 planet[k] = quantity
 
     def compute_fleets(self, planet, scaling_level):
-        if not self.config["fleet_on_planet_proba"]():
+        if not self.config["fleet_on_planet_proba"](scaling_level):
             return
         fleet_juice = self.compute_planet_juice(scaling_level, planet) * self.config["fleet_worth_multiplier"]()
         fleet_ships = {k: v for k,v in planet_item.fleets.items() if v.juice < fleet_juice }

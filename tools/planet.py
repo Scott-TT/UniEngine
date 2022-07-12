@@ -53,12 +53,15 @@ class Planet:
     def init_buildings(self):
         self.parameters = { **self.parameters, **self.generator.generate_planet_buildings(self.scaling_level) }
 
-    def print_debug (self, display_fleet=False, display_defenses=False):
+    def print_debug (self, display_fleet=True, display_defenses=True):
         scale = planet_scaling.PlanetScaling()
         ships = {k:v for k,v in self.parameters.items() if k in planet_item.fleets }
         defenses = {k:v for k,v in self.parameters.items() if k in planet_item.buildings }
-        print("Scaling factor of (%d,%d,%d) : %f" % (self.parameters["galaxy"],self.parameters["system"],self.parameters["planet"]
-                                                    ,scale.compute_scaling_factor(linear_scaling_level=self.scaling_level)))
+        print("Scaling factor of (%d,%d,%d) : %f / %f"
+                                                   % (self.parameters["galaxy"],self.parameters["system"],self.parameters["planet"]
+                                                    ,scale.compute_scaling_factor(linear_scaling_level=self.scaling_level)
+                                                    ,scale.compute_scaling_factor(linear_scaling_level=self.scaling_level, mode="exponential")
+                                                   ))
         if display_fleet:
             print("Ships:")
             #pprint.pprint(ships)
@@ -67,7 +70,7 @@ class Planet:
                 cost += planet_item.fleets[type].total_cost() * quantity
             print("  Total cost : %s" % f"{cost:,}")
         if display_defenses:
-            print("\nDefenses:")
+            print("Defenses:")
             #pprint.pprint(defenses)
             cost = 0
             for type, quantity in defenses.items():

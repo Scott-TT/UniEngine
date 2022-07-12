@@ -67,9 +67,13 @@ def populate_everything(depopulate=True, coordinates_blacklist=[]):
         populate_galaxy(galaxy=i, coordinates_blacklist=coordinates_blacklist)
 
 #populate_everything(coordinates_blacklist=retrieve_existing_planets_coordinates())
+scaling = PlanetScaling()
 for i in range(10):
-    print("\n--Galaxy %d--"%i)
-    p = Planet(i,10,8)
+    print()
+    p = Planet(4,400,1)
+    linear = p.scaling_level
+    expo = scaling.compute_scaling_factor(linear_scaling_level=linear, mode="exponential")
+    print("Scaling %f => %f" % (linear,expo))
     p.print_debug()
 
 cursor.close()                          

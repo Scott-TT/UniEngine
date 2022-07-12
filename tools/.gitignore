@@ -1,3 +1,4 @@
 database_config.py
 
 __pycache__
+.vs/*
