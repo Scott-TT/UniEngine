@@ -52,7 +52,7 @@ def depopulate_everything():
 def populate_system(galaxy, system, coordinates_blacklist=[]):
     for i in range(1,16):
         if random.randint(0,100) < 30:
-            p = planet(galaxy=galaxy, system=system, planet=i)
+            p = Planet(galaxy=galaxy, system=system, planet=i)
             insert_planet(p=p, existing_planets=coordinates_blacklist)
 
 def populate_galaxy(galaxy, coordinates_blacklist=[]):
@@ -66,12 +66,8 @@ def populate_everything(depopulate=True, coordinates_blacklist=[]):
     for i in range(1,10):
         populate_galaxy(galaxy=i, coordinates_blacklist=coordinates_blacklist)
 
-#populate_everything(coordinates_blacklist=retrieve_existing_planets_coordinates())
-scaling = PlanetScaling()
-for i in range(10):
-    print()
-    p = Planet(i,250,2)
-    p.print_debug(display_fleet=True, display_defenses=False)
+#populate_everything(depopulate=True, coordinates_blacklist=retrieve_existing_planets_coordinates())
+
 
 cursor.close()                          
 cnx.commit()

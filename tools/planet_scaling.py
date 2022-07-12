@@ -78,7 +78,7 @@ class PlanetScaling:
             m2 = self.config["level_mines_max"]
             m1 = self.config["level_mines_min"]
             average = self.config["level_mines_min"] + scaling_factor * (math.log(math.exp(m2-m1)-math.exp(m1)))
-            blevel = random.gauss(average,2+average/6)
+            blevel = random.gauss(average,3)
             blevel = max(0,min(50,blevel))
             planet[b] = math.floor(blevel)
             planet["solar_plant"] = max(planet["solar_plant"], planet[b])

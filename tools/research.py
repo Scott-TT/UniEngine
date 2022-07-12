@@ -1,6 +1,8 @@
 import math
 import economy_config
 
+from pprint import pprint
+
 class Research:
     def __init__(self, metal, crystal, deut, dependencies=None):
         self.metal = metal
@@ -11,19 +13,72 @@ class Research:
         else:
             self.dependencies = dependencies
 
-    def get_total_cost(self, level):
+    def get_levelup_cost(self, level):
+        cost = {}
+        for r in ["metal","crystal","deut"]:
+            cost[r] = math.floor(getattr(self,r) * (math.pow(2,level-1)))
+        return cost
+
+    def get_cost(self, level, levelup_only=None, include_dependencies=None):
+        if levelup_only is None or levelup_only == True:
+            return self.get_levelup_cost(level)
+
+        if include_dependencies is None:
+            include_dependencies = True
         cost = {}
         for r in ["metal","crystal","deut"]:
             total_cost = math.floor(getattr(self,r) * (math.pow(2,level-1)))
-            for dependency in self.dependencies:
-                for dep_tech, dep_level in dependency.items():
-                    total_cost += (all_techs[dep_tech].get_total_cost(dep_level))[r]
+            if include_dependencies:
+                for dependency in self.dependencies:
+                    for dep_tech, dep_level in dependency.items():
+                        total_cost += (all_techs[dep_tech].get_cost(level=dep_level, levelup_only=False, include_dependencies=True))[r]
             cost[r] = total_cost
         return cost
 
-    def get_simplified_cost(self, level):
-        cost = self.get_total_cost(level)
+    def get_simplified_cost(self, level, levelup_only=None, include_dependencies=None):
+        cost = self.get_cost(level, levelup_only=levelup_only, include_dependencies=include_dependencies)
         return cost["metal"]*economy_config.metal_cost_ratio + cost["crystal"]*economy_config.crystal_cost_ratio + cost["deut"]*economy_config.deut_cost_ratio
+
+class TechTree:
+    def __init__(self):
+        self.tech = {"espionage" : 0
+                    ,"computer" : 0
+                    ,"weapons" : 0
+                    ,"shielding" : 0
+                    ,"armour" : 0
+                    ,"energy" : 0
+                    ,"hyperspace" : 0
+                    ,"combustion_drive" : 0
+                    ,"impulse_drive" : 0
+                    ,"hyperspace_drive" : 0
+                    ,"laser" : 0
+                    ,"ion" : 0
+                    ,"plasma" : 0
+                    ,"IRN" : 0
+                    ,"astrophysic" : 0
+                }
+
+    def print(self):
+        pprint(self.tech)
+
+    def spend_budget(self, budget):
+        remaining_budget = budget
+        upgrade_costs = {}
+        # Initialize costs
+        for t,level in self.tech.items():
+            if level == 0:
+                upgrade_costs[t] = all_techs[t].get_simplified_cost(level=1, levelup_only=False, include_dependencies=True)
+            else:
+                upgrade_costs[t] = all_techs[t].get_simplified_cost(level=level+1, levelup_only=True)
+        # Allocate the cheapest possible item, until out of budget
+        while remaining_budget > 0:
+            cheapest_tech = min(upgrade_costs, key=upgrade_costs.get)
+            if upgrade_costs[cheapest_tech] < remaining_budget:
+                remaining_budget -= upgrade_costs[cheapest_tech]
+                self.tech[cheapest_tech] += 1
+                upgrade_costs[cheapest_tech] = all_techs[cheapest_tech].get_simplified_cost(level=self.tech[cheapest_tech]+1, levelup_only=True)
+            else:
+                break
 
 
 all_techs = {

@@ -20,10 +20,11 @@ class PlanetItem:
         else:
             self.buildings_required = buildings_required
 
+    # Note: tech overlaps are counted twice(or more). Not worth the bother currently.
     def simplified_tech_cost(self):
         cost = 0
         for tech_type, tech_level in self.tech_required.items():
-            cost += research.all_techs[tech_type].get_simplified_cost(tech_level)
+            cost += research.all_techs[tech_type].get_simplified_cost(level=tech_level, levelup_only=False, include_dependencies=True)
         return math.floor(cost)
 
     def simplified_cost(self):
