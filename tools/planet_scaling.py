@@ -2,9 +2,12 @@ import random
 import math
 import time
 
+from pprint import pprint
+
 import planet_item
 import economy_config
 import defense_scaling
+import fleet_scaling
 
 class PlanetScaling:
     def __init__(self, config=None):
@@ -65,14 +68,8 @@ class PlanetScaling:
         if not self.config["fleet_on_planet_proba"](scaling_level):
             return
         fleet_juice = self.compute_planet_juice(scaling_level, planet) * self.config["fleet_worth_multiplier"]()
-        fleet_ships = {k: v for k,v in planet_item.fleets.items() if v.juice < fleet_juice }
-        total_value_per_item = fleet_juice / max(1,len(fleet_ships))
-        for k,v in fleet_ships.items():
-            if v.simplified_tech_cost() > fleet_juice:
-                continue
-            quantity = math.floor(total_value_per_item / v.juice * random.gauss(80,20) / 100)
-            if quantity > 0:
-                planet[k] = quantity
+        scaler = fleet_scaling.get_random_profile()
+        scaler.fill_fleets(planet=planet, juice=fleet_juice)
 
     def compute_mines_level(self, planet, scaling_level):
         scaling_factor = self.compute_scaling_factor(linear_scaling_level=scaling_level, mode="linear")

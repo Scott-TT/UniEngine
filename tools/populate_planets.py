@@ -71,10 +71,7 @@ scaling = PlanetScaling()
 for i in range(10):
     print()
     p = Planet(i,250,2)
-    linear = p.scaling_level
-    expo = scaling.compute_scaling_factor(linear_scaling_level=linear, mode="exponential")
-    print("Scaling %f => %f" % (linear,expo))
-    p.print_debug()
+    p.print_debug(display_fleet=True, display_defenses=False)
 
 cursor.close()                          
 cnx.commit()

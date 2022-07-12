@@ -25,7 +25,7 @@ class ZenMaster(DefenseScaling):
         for k,v in defense_buildings.items():
             if v.simplified_tech_cost() > juice:
                 continue
-            quantity = math.floor(total_value_per_item / v.juice * random.randint(50,200)/100)
+            quantity = math.floor(total_value_per_item / v.juice * random.gauss(100,15)/100)
             if v.maximum_quantity:
                 quantity = min(v.maximum_quantity,quantity)
             if quantity > 0:
@@ -42,7 +42,7 @@ class RatioBalance(DefenseScaling):
         if total_weights == 0:
             return
         for k,v in defense_buildings.items():
-            quantity = math.floor((self.ratios[k]/total_weights) * juice/v.simplified_cost())
+            quantity = math.floor((self.ratios[k]/total_weights) * juice/v.simplified_cost() * random.gauss(100,10)/100)
             if v.maximum_quantity:
                 quantity = min(v.maximum_quantity,quantity)
             if quantity > 0:
