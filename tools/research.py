@@ -48,14 +48,14 @@ class TechTree:
                     ,"armour" : 0
                     ,"energy" : 0
                     ,"hyperspace" : 0
-                    ,"combustion_drive" : 0
-                    ,"impulse_drive" : 0
-                    ,"hyperspace_drive" : 0
+                    ,"combustiondrive" : 0
+                    ,"impulsedrive" : 0
+                    ,"hyperspacedrive" : 0
                     ,"laser" : 0
                     ,"ion" : 0
                     ,"plasma" : 0
-                    ,"IRN" : 0
-                    ,"astrophysic" : 0
+                    ,"interresearchnetwork" : 0
+                    ,"expedition" : 0
                 }
 
     def print(self):
@@ -89,12 +89,12 @@ all_techs = {
     ,"armour" : Research(1000,0,0)
     ,"energy" : Research(0,800,400)
     ,"hyperspace" : Research(0,4000,2000, dependencies=[{"energy":5},{"shielding":5}])
-    ,"combustion_drive" : Research(400,0,600, dependencies=[{"energy":1}])
-    ,"impulse_drive" : Research(2000,4000,600, dependencies=[{"energy":1}])
-    ,"hyperspace_drive" : Research(10000,20000,6000, dependencies=[{"hyperspace":3}])
+    ,"combustiondrive" : Research(400,0,600, dependencies=[{"energy":1}])
+    ,"impulsedrive" : Research(2000,4000,600, dependencies=[{"energy":1}])
+    ,"hyperspacedrive" : Research(10000,20000,6000, dependencies=[{"hyperspace":3}])
     ,"laser" : Research(200,100,0, dependencies=[{"energy":2}])
     ,"ion" : Research(1000,300,0, dependencies=[{"laser":5},{"energy":4}])
     ,"plasma" : Research(2000,4000,0, dependencies=[{"laser":10},{"energy":8},{"ion":5}])
-    ,"IRN" : Research(240000,400000,160000, dependencies=[{"computer":8},{"hyperspace":8}])
-    ,"astrophysic" : Research(4000,8000,4000)
+    ,"interresearchnetwork" : Research(240000,400000,160000, dependencies=[{"computer":8},{"hyperspace":8}])
+    ,"expedition" : Research(4000,8000,4000)
 }

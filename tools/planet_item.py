@@ -66,14 +66,14 @@ for item in [
     fleets[item.key] = item
 
 # Add dependencies (delayed for clarity)
-fleets["small_cargo_ship"].tech_required = {"combustion_drive":2}
-fleets["big_cargo_ship"].tech_required = {"combustion_drive":6}
-fleets["light_fighter"].tech_required = {"combustion_drive":1}
-fleets["heavy_fighter"].tech_required = {"armour":2,"impulse_drive":2}
-fleets["cruiser"].tech_required = {"impulse_drive":4,"ion":2}
-fleets["battleship"].tech_required = {"hyperspace_drive":4}
-fleets["battlecruiser"].tech_required = {"hyperspace":5,"laser":12,"hyperspace_drive":5}
-fleets["recycler"].tech_required = {"combustion_drive":6,"shielding":2}
-fleets["bomber"].tech_required = {"impulse_drive":6,"plasma":5}
-fleets["destroyer"].tech_required = {"hyperspace_drive":6,"hyperspace":5}
-fleets["deathstar"].tech_required = {"hyperspace_drive":7,"hyperspace":6}  # Graviton skipped
+fleets["small_cargo_ship"].tech_required = {"combustiondrive":2}
+fleets["big_cargo_ship"].tech_required = {"combustiondrive":6}
+fleets["light_fighter"].tech_required = {"combustiondrive":1}
+fleets["heavy_fighter"].tech_required = {"armour":2,"impulsedrive":2}
+fleets["cruiser"].tech_required = {"impulsedrive":4,"ion":2}
+fleets["battleship"].tech_required = {"hyperspacedrive":4}
+fleets["battlecruiser"].tech_required = {"hyperspace":5,"laser":12,"hyperspacedrive":5}
+fleets["recycler"].tech_required = {"combustiondrive":6,"shielding":2}
+fleets["bomber"].tech_required = {"impulsedrive":6,"plasma":5}
+fleets["destroyer"].tech_required = {"hyperspacedrive":6,"hyperspace":5}
+fleets["deathstar"].tech_required = {"hyperspacedrive":7,"hyperspace":6}  # Graviton skipped

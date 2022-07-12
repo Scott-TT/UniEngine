@@ -5,69 +5,69 @@ import math
 import time
 import pprint
 
-import database_config
 from planet import Planet
 from planet_scaling import PlanetScaling
 
-db_config = database_config.default_config
-cnx = pymysql.connect(user = db_config.user
-                        ,password = db_config.password
-                        ,host = db_config.host
-                        ,database = db_config.database
-                        )
-cursor = cnx.cursor()
+class PopulatePlanets():
 
-def retrieve_existing_planets_coordinates():  
-    sql = "SELECT galaxy, system, planet FROM _planets"
-    cursor.execute(sql)
-    existing_planets = cursor.fetchall()
-    return existing_planets
+    def __init__(self, cursor, existing_planets=None, planet_probability_expression=None):
+        self.cursor = cursor
+        if existing_planets is None:
+            self.existing_planets = self.retrieve_existing_planets_coordinates()
+        else:
+            self.existing_planets = existing_planets
 
-def insert_planet(p, existing_planets): 
-    if (p.parameters["galaxy"], p.parameters["system"], p.parameters["planet"]) in existing_planets:
-        return
+        if planet_probability_expression is None:
+            self.planet_probability_expression = (lambda g,s,p: random.randint(0,100) < 30)
+        else:
+            self.planet_probability_expression = planet_probability_expression
+
+    def retrieve_existing_planets_coordinates(self):  
+        sql = "SELECT galaxy, system, planet FROM _planets"
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
+
+    def insert_planet(self, p): 
+        if (p.parameters["galaxy"], p.parameters["system"], p.parameters["planet"]) in self.existing_planets:
+            return
   
-    # Actual planet insertion
-    values_placeholder = ', '.join(['%s'] * len(p.parameters))
-    columns = ', '.join(p.parameters.keys())
-    sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % ("_planets", columns, values_placeholder)
-    cursor.execute(sql, list(p.parameters.values()))
+        # Actual planet insertion
+        values_placeholder = ', '.join(['%s'] * len(p.parameters))
+        columns = ', '.join(p.parameters.keys())
+        sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % ("_planets", columns, values_placeholder)
+        self.cursor.execute(sql, list(p.parameters.values()))
   
-    # Galaxy reference chart
-    galaxy_entry = { "id_planet" : cursor.lastrowid }
-    for k in ["galaxy", "system", "planet"]:
-        galaxy_entry[k] = p.parameters[k]
-    values_placeholder = ', '.join(['%s'] * len(galaxy_entry))
-    columns = ', '.join(galaxy_entry.keys())
-    sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % ("_galaxy", columns, values_placeholder)
-    cursor.execute(sql, list(galaxy_entry.values()))
+        # Galaxy reference chart
+        galaxy_entry = { "id_planet" : self.cursor.lastrowid }
+        for k in ["galaxy", "system", "planet"]:
+            galaxy_entry[k] = p.parameters[k]
+        values_placeholder = ', '.join(['%s'] * len(galaxy_entry))
+        columns = ', '.join(galaxy_entry.keys())
+        sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % ("_galaxy", columns, values_placeholder)
+        self.cursor.execute(sql, list(galaxy_entry.values()))
   
   
-def depopulate_everything():
-    sql="DELETE FROM _planets WHERE id > 2 AND id_owner=2"
-    cursor.execute(sql)
-    sql="DELETE FROM _galaxy WHERE galaxy_id>2 AND id_planet NOT IN (SELECT id from _planets)"
-    cursor.execute(sql)
+    def depopulate_everything(self, confirm=False):
+        if confirm == False:
+            print("Refusing to depopulation due to lack of confirmation")
+            return
+        sql="DELETE FROM _planets WHERE id > 2 AND id_owner=2"
+        self.cursor.execute(sql)
+        sql="DELETE FROM _galaxy WHERE galaxy_id>2 AND id_planet NOT IN (SELECT id from _planets)"
+        self.cursor.execute(sql)
   
-def populate_system(galaxy, system, coordinates_blacklist=[]):
-    for i in range(1,16):
-        if random.randint(0,100) < 30:
-            p = Planet(galaxy=galaxy, system=system, planet=i)
-            insert_planet(p=p, existing_planets=coordinates_blacklist)
+    def populate_system(self, galaxy, system):
+        for i in range(1,16):
+            if self.planet_probability_expression(galaxy, system, i):
+                p = Planet(galaxy=galaxy, system=system, planet=i)
+                self.insert_planet(p)
 
-def populate_galaxy(galaxy, coordinates_blacklist=[]):
-    for i in range(1,500):
-        populate_system(galaxy=galaxy, system=i, coordinates_blacklist=coordinates_blacklist)
+    def populate_galaxy(self, galaxy):
+        for i in range(1,500):
+            self.populate_system(galaxy=galaxy, system=i)
 
-def populate_everything(depopulate=True, coordinates_blacklist=[]):
-    if depopulate:
-        depopulate_everything()
-  
-    for i in range(1,10):
-        populate_galaxy(galaxy=i, coordinates_blacklist=coordinates_blacklist)
-
-#populate_everything(depopulate=True, coordinates_blacklist=retrieve_existing_planets_coordinates())
-
-
-cursor.close()                          
-cnx.commit()
+    def populate_everything(self, depopulate=True):
+        if depopulate:
+            self.depopulate_everything()
+        for i in range(1,10):
+            self.populate_galaxy(galaxy=i)

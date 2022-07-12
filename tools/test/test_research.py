@@ -26,4 +26,4 @@ class TestResearch(unittest.TestCase):
         tech_tree.spend_budget(150000)
         self.assertEqual(6, tech_tree.tech["laser"])
         self.assertEqual(4, tech_tree.tech["armour"])
-        self.assertEqual(3, tech_tree.tech["combustion_drive"])
+        self.assertEqual(3, tech_tree.tech["combustiondrive"])
