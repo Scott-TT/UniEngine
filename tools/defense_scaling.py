@@ -1,5 +1,6 @@
 import math
 import random
+import pprint
 
 import planet_item
 
@@ -37,7 +38,7 @@ class RatioBalance(DefenseScaling):
         
     def fill_defenses(self, planet, juice):
         defense_buildings = {k: v for k,v in planet_item.buildings.items() if k in self.ratios and self.ratios[k]>0 and v.juice < juice and v.simplified_tech_cost() < juice }
-        total_weights = sum([ self.ratios[k] for k,v in defense_buildings.items() if v.maximum_quantity is not None])
+        total_weights = sum([ self.ratios[k] for k,v in defense_buildings.items() if v.maximum_quantity is None])
         if total_weights == 0:
             return
         for k,v in defense_buildings.items():
@@ -164,10 +165,24 @@ class AverageBalance(RatioBalance):
                                        }
                               )
 
+class OneTrickPony(RatioBalance):
+    def __init__(self):
+        ratios = {"small_shield_dome":10,"large_shield_dome":10}
+        pick_order = [ k for k in list(planet_item.buildings) if planet_item.buildings[k].maximum_quantity is None ]
+        random.shuffle(pick_order)
+        main_trick = pick_order[0]
+        ratios[main_trick] = 100
+        for i in range(1,len(pick_order)-1):
+            if random.random() < 0.5:
+                ratios[pick_order[i]] = 10
+            else:
+                break
+        RatioBalance.__init__(self, ratios=ratios)
 
 
-defensers_profiles = [  RocketMan(), FodderLover(),  BigGun(), FodderHeavy()
-                        ,EarlyBalance(), AverageBalance(), LateBalance(), ZenMaster()
-                        ,AntiRip(), AntiBattleships()
+defensers_profiles = [  RocketMan(), FodderLover(), BigGun(), FodderHeavy()
+                       ,EarlyBalance(), AverageBalance(), LateBalance(), ZenMaster()
+                       ,AntiRip(), AntiBattleships()
+                       ,OneTrickPony()
                      ]
 
