@@ -70,7 +70,7 @@ def populate_everything(depopulate=True, coordinates_blacklist=[]):
 scaling = PlanetScaling()
 for i in range(10):
     print()
-    p = Planet(4,400,1)
+    p = Planet(i,250,2)
     linear = p.scaling_level
     expo = scaling.compute_scaling_factor(linear_scaling_level=linear, mode="exponential")
     print("Scaling %f => %f" % (linear,expo))

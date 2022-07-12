@@ -4,6 +4,7 @@ import time
 
 import planet_item
 import economy_config
+import defense_scaling
 
 class PlanetScaling:
     def __init__(self, config=None):
@@ -57,16 +58,8 @@ class PlanetScaling:
 
     def compute_static_defenses(self, planet, scaling_level):
         defense_juice = self.compute_planet_juice(scaling_level, planet) * self.config["defenses_worth_multiplier"]()
-        defense_buildings = {k: v for k,v in planet_item.buildings.items() if v.juice < defense_juice }
-        total_value_per_item = defense_juice / max(1,len(defense_buildings))
-        for k,v in defense_buildings.items():
-            if v.simplified_tech_cost() > defense_juice:
-                continue
-            quantity = math.floor(total_value_per_item / v.juice * random.randint(50,200)/100)
-            if v.maximum_quantity:
-                quantity = min(v.maximum_quantity,quantity)
-            if quantity > 0:
-                planet[k] = quantity
+        scaler = defense_scaling.get_random_profile()
+        scaler.fill_defenses(planet=planet, juice=defense_juice)
 
     def compute_fleets(self, planet, scaling_level):
         if not self.config["fleet_on_planet_proba"](scaling_level):
