@@ -5,7 +5,7 @@ function HandleShipyardQueue($TheUser, &$ThePlanet, $ProductionTime, $EndTime)
     global $_Vars_GameElements;
     $Builded = array();
 
-    if($ThePlanet['shipyardQueue'] != 0)
+    if(!empty($ThePlanet['shipyardQueue']))
     {
         $ThePlanet['shipyardQueue_additionalWorkTime'] += $ProductionTime;
 
