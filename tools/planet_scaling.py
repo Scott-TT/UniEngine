@@ -14,10 +14,12 @@ class PlanetScaling:
         if config == None:
             self.config = {
                 "universe_production_multiplier": economy_config.production_multiplier
-                ,"level_mines_min"              : 6
-                ,"level_mines_max"              : 40
+                ,"level_mines_min"              : 0
+                ,"level_mines_max"              : 45
                 ,"level_storage_min"            : 0
-                ,"level_storage_max"            : 20
+                ,"level_storage_max"            : 30
+                ,"production_time_min"          : 24
+                ,"production_time_max"          : 24*365*10
                 ,"linear_to_exponential_scaling": (lambda x: x * math.exp(2*(math.pow(x,2)-1)))
                 ,"fleet_on_planet_proba"        : (lambda x: random.randint(0,100) < 40-3*x)
                 ,"fleet_worth_multiplier"       : (lambda  : random.randint(20,100)/100)
@@ -53,9 +55,8 @@ class PlanetScaling:
     def compute_planet_juice(self, scaling_level, planet):
         scaling_linear = self.compute_scaling_factor(linear_scaling_level=scaling_level, mode="linear")
         scaling_exp    = self.compute_scaling_factor(linear_scaling_level=scaling_level, mode="exponential")
-        seniority_days_factor  = scaling_exp * 365 * 24
-        seniority_days_factor += math.floor(min(7, max(scaling_linear*7,0))) * 24
-        juice = self.compute_total_production_per_hour(planet) * seniority_days_factor 
+        seniority  = scaling_exp * self.config["production_time_max"]
+        juice = self.compute_total_production_per_hour(planet) * ( seniority + self.config["production_time_min"])
         juice = math.floor(juice)
         return juice
 

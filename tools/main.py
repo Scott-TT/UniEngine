@@ -48,7 +48,10 @@ if len(sys.argv) == 2:
     elif sys.argv[1] == "--regenerate":
         regenerate_bot_planets()
 else:
-    pass 
+    for (g,s,p) in [ (g,s,p) for g in range(1,5) for s in range(1,500,999) for p in range(1,16,999) ]:
+        p = planet.Planet(galaxy=g, system=s, planet=p)
+        p.print_debug(display_defenses=True, display_scaling=True)
+        print()
 
 cursor.close()                 
 cnx.commit()
