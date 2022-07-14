@@ -4,6 +4,8 @@ import random
 from pprint import pprint
 
 import database_config
+import defense_scaling
+import fleet_scaling
 import planet
 import planet_scaling
 import player_scaling
@@ -32,7 +34,17 @@ def generate_everything():
     generate_all_players()
     generate_all_planets()
 
-generate_everything()
+# Updates existing bot planets, without altering overall galaxy state
+def regenerate_planets():
+    galaxy_gen = populate_planets.PopulatePlanets( cursor
+                                                  ,populate_planets.retrieve_existing_planets_coordinates(cursor=cursor, only_bots=True)
+                                                  )
+
+if False:
+    generate_everything()
+
+if False:
+    regenerate_planets()
 
 cursor.close()                 
 cnx.commit()

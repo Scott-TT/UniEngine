@@ -12,10 +12,9 @@ import player_scaling
 
 class Planet:
 
-    def __init__(self, galaxy, system, planet, owner_id=None):
+    def __init__(self, galaxy, system, planet, owner_id=None, empty_shell=True):
         self.parameters = {
             "Name" : randomname.get_name()
-            #,"id_owner" : 2
             ,"galaxy" : galaxy
             ,"system" : system
             ,"planet" : planet
@@ -29,6 +28,8 @@ class Planet:
         self.planet = planet
         self.scaling_level = self.generator.compute_scaling_factor(planet=self)
         self.init_geo()
+        if empty_shell:
+            return
         self.init_buildings()
         self.init_resources_values()
         if owner_id == None:
@@ -64,11 +65,11 @@ class Planet:
     def init_buildings(self):
         self.parameters = { **self.parameters, **self.generator.generate_planet_buildings(self.scaling_level) }
 
-    def print_debug (self, display_fleet=False, display_defenses=False):
+    def print_debug (self, display_scaling=False, display_fleet=False, display_defenses=False):
         scale = planet_scaling.PlanetScaling()
         ships = {k:v for k,v in self.parameters.items() if k in planet_item.fleets }
         defenses = {k:v for k,v in self.parameters.items() if k in planet_item.buildings }
-        if False:
+        if display_scaling:
             print("Scaling factor of (%d,%d,%d) : %f / %f"
                                                    % (self.parameters["galaxy"],self.parameters["system"],self.parameters["planet"]
                                                     ,scale.compute_scaling_factor(linear_scaling_level=self.scaling_level)
@@ -76,14 +77,14 @@ class Planet:
                                                    ))
         if display_fleet:
             print("Ships:")
-            pprint.pprint(ships)
+            pprint(ships)
             cost = 0
             for type, quantity in ships.items():
                 cost += planet_item.fleets[type].total_cost() * quantity
             print("  Total cost : %s" % f"{cost:,}")
         if display_defenses:
             print("Defenses:")
-            pprint.pprint(defenses)
+            pprint(defenses)
             cost = 0
             for type, quantity in defenses.items():
                 cost += planet_item.buildings[type].total_cost() * quantity
