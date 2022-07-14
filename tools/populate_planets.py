@@ -22,7 +22,7 @@ class PopulatePlanets():
             only_bots = False
         sql = "SELECT galaxy, system, planet FROM _planets"
         if only_bots == True:
-            # We exclude players instead of including bots, as they may have been deleted
+            # We exclude players instead of including bots
             sql += " WHERE id_owner NOT IN (SELECT id FROM _users WHERE isAI=0)"
         self.cursor.execute(sql)
         return self.cursor.fetchall()

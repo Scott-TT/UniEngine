@@ -21,16 +21,26 @@ class PlanetScaling:
                 ,"production_time_min"          : 24
                 ,"production_time_max"          : 24*365*10
                 ,"linear_to_exponential_scaling": (lambda x: x * math.exp(2*(math.pow(x,2)-1)))
-                ,"fleet_on_planet_proba"        : (lambda x: random.randint(0,100) < 40-3*x)
-                ,"fleet_worth_multiplier"       : (lambda  : random.randint(20,100)/100)
+                ,"fleet_on_planet_proba"        : (lambda x: random.randint(0,100) < 50-2*x)
+                ,"fleet_worth_multiplier"       : (lambda  : random.randint(50,100)/100)
                 ,"defenses_worth_multiplier"    : (lambda  : random.randint(40,100)/100)
             }
 
     def compute_scaling_factor(self, planet=None, linear_scaling_level=None, mode=None):
         linear_scaling = 0
-        if linear_scaling_level == None:
-            linear_scaling = (planet.parameters["galaxy"]-1)*10 + planet.parameters["system"]*20/500 + random.gauss(0,5)
+        if linear_scaling_level is None:
+            if planet is None:
+                raise
+             # Compute base level
+            linear_scaling = (planet.parameters["galaxy"]-1)*10 \
+                            + min(400,max(100,planet.parameters["system"]))*20/400
             linear_scaling /= 100
+            # Throw in some noise
+            if linear_scaling < 1:
+                linear_scaling *= random.gauss(1,0.2)
+                linear_scaling += random.gauss(0,0.1) # Can be negative
+            # Clamp to [0-1]
+            linear_scaling = min(1,max(0,linear_scaling))
         else:
             linear_scaling = linear_scaling_level
 

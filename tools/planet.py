@@ -70,10 +70,12 @@ class Planet:
         ships = {k:v for k,v in self.parameters.items() if k in planet_item.fleets }
         defenses = {k:v for k,v in self.parameters.items() if k in planet_item.buildings }
         if display_scaling:
-            print("Scaling factor of (%d,%d,%d) : %f / %f"
+            print("Scaling factor of (%d,%d,%d) : \
+\n  linear=%f \n  exponential=%f\n  juice=>%s"
                                                    % (self.parameters["galaxy"],self.parameters["system"],self.parameters["planet"]
                                                     ,scale.compute_scaling_factor(linear_scaling_level=self.scaling_level)
                                                     ,scale.compute_scaling_factor(linear_scaling_level=self.scaling_level, mode="exponential")
+                                                    ,f'{scale.compute_planet_juice(self.scaling_level, self.parameters):,}'
                                                    ))
         if display_fleet:
             print("Ships:")

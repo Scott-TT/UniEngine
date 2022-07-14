@@ -48,10 +48,15 @@ if len(sys.argv) == 2:
     elif sys.argv[1] == "--regenerate":
         regenerate_bot_planets()
 else:
-    for (g,s,p) in [ (g,s,p) for g in range(1,5) for s in range(1,500,999) for p in range(1,16,999) ]:
-        p = planet.Planet(galaxy=g, system=s, planet=p)
-        p.print_debug(display_defenses=True, display_scaling=True)
-        print()
+    count_planets = 0
+    count_grox = 0
+    for (g,s,p) in [ (g,s,p) for g in range(1,10) for s in range(1,501) for p in range(1,16)]:
+        the_planet = planet.Planet(galaxy=g, system=s, planet=p)
+        count_planets += 1
+        if the_planet.scaling_level == 1:
+            count_grox += 1
+    print(f"{count_grox} grox planets out of {count_planets} total")
+
 
 cursor.close()                 
 cnx.commit()
