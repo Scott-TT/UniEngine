@@ -40,7 +40,7 @@ all_players = [
            ,Player("Protoss", budget=5000000)
            ,Player("Hard Core Kerry", budget=10000000)
            ,Player("Bob the Builder", budget=50000000)
-           ,Player("Grox Empire", budget=100000000)
+           ,Player("Protean", budget=100000000)
            ,Player("e-1337", budget=500000000)
-           ,Player("Protean", budget=1000000000)
+           ,Player("Grox Empire", budget=1000000000)
     ]

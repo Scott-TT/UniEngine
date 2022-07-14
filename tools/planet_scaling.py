@@ -14,8 +14,8 @@ class PlanetScaling:
         if config == None:
             self.config = {
                 "universe_production_multiplier": economy_config.production_multiplier
-                ,"level_mines_min"              : 0
-                ,"level_mines_max"              : 45
+                ,"level_mines_min"              : 3
+                ,"level_mines_max"              : 42
                 ,"level_storage_min"            : 0
                 ,"level_storage_max"            : 30
                 ,"production_time_min"          : 24
@@ -85,24 +85,30 @@ class PlanetScaling:
     def compute_mines_level(self, planet, scaling_level):
         scaling_factor = self.compute_scaling_factor(linear_scaling_level=scaling_level, mode="linear")
         planet["solar_plant"] = 1
-        for b in ["metal_mine","crystal_mine","deuterium_synthesizer"]:
-            m2 = self.config["level_mines_max"]
-            m1 = self.config["level_mines_min"]
-            average = self.config["level_mines_min"] + scaling_factor * (math.log(math.exp(m2-m1)-math.exp(m1)))
-            blevel = random.gauss(average,3)
+        for mine in ["metal_mine","crystal_mine","deuterium_synthesizer"]:
+            c = self.config["level_mines_max"]
+            m1 = max(1,self.config["level_mines_min"])
+            a = (c-m1)/m1
+            x = scaling_factor
+            b = 5.5
+            average = c / ( 1 + a * math.exp(-b*x))
+            blevel = random.gauss(average,2)
             blevel = max(0,min(50,blevel))
-            planet[b] = math.floor(blevel)
-            planet["solar_plant"] = max(planet["solar_plant"], planet[b])
+            planet[mine] = math.floor(blevel)
+            planet["solar_plant"] = max(planet["solar_plant"], planet[mine])
 
     def compute_storage_level(self, planet, scaling_level):
         scaling_factor = self.compute_scaling_factor(linear_scaling_level=scaling_level, mode="linear")
-        for b in ["metal_storage","crystal_storage","deuterium_tank"]:
-            m2 = self.config["level_storage_max"]
-            m1 = self.config["level_storage_min"]
-            average = self.config["level_storage_min"] + scaling_factor * (math.log(math.exp(m2-m1)-math.exp(m1)))
-            blevel = random.gauss(average,average/12)
+        for storage in ["metal_storage","crystal_storage","deuterium_tank"]:
+            c = self.config["level_storage_max"]
+            m1 = max(1,self.config["level_storage_min"])
+            a = (c-m1)/m1
+            x = scaling_factor
+            b = 5.5
+            average = c / ( 1 + a * math.exp(-b*x))
+            blevel = random.gauss(average,math.ceil(average/12))
             blevel = max(0,min(50,blevel))
-            planet[b] = math.floor(blevel)
+            planet[storage] = math.floor(blevel)
 
     def generate_planet_buildings(self, scaling_level):
         planet = {}

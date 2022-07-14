@@ -50,13 +50,9 @@ if len(sys.argv) == 2:
 else:
     count_planets = 0
     count_grox = 0
-    for (g,s,p) in [ (g,s,p) for g in range(1,10) for s in range(1,501) for p in range(1,16)]:
+    for (g,s,p) in [ (g,s,p) for g in range(1,10) for s in [100] for p in [1]]:
         the_planet = planet.Planet(galaxy=g, system=s, planet=p)
-        count_planets += 1
-        if the_planet.scaling_level == 1:
-            count_grox += 1
-    print(f"{count_grox} grox planets out of {count_planets} total")
-
+        print(f"{g},{s}")
 
 cursor.close()                 
 cnx.commit()
