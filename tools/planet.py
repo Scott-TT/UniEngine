@@ -55,11 +55,11 @@ class Planet:
         self.parameters["deuterium"] = self.parameters["deuterium_perhour"] * 24*7
 
         # Compute and apply maximum storage capacity
-        self.parameters["metal_max"] = 100000 + 5000 * ( 2.5 * math.exp(20/33 * self.parameters["metal_storage"]))
+        self.parameters["metal_max"] = 100000 * math.pow(1.7,self.parameters["metal_storage"])
         self.parameters["metal"] = min(self.parameters["metal"], self.parameters["metal_max"])
-        self.parameters["crystal_max"] = 100000 + 5000 * ( 2.5 * math.exp(20/33 * self.parameters["crystal_storage"]))
+        self.parameters["crystal_max"] =  100000 * math.pow(1.7,self.parameters["crystal_storage"])
         self.parameters["crystal"] = min(self.parameters["crystal"], self.parameters["crystal_max"])
-        self.parameters["deuterium_max"] = 100000 + 50000 * ( 1.6 ** self.parameters["deuterium_tank"] - 1 )
+        self.parameters["deuterium_max"] =  100000 * math.pow(1.7,self.parameters["deuterium_tank"])
         self.parameters["deuterium"] = min(self.parameters["deuterium"], self.parameters["deuterium_max"])
   
     def init_buildings(self):

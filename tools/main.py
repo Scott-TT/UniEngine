@@ -42,10 +42,13 @@ def regenerate_bot_planets():
     galaxy_gen.populate_planets(in_place=True)
 
 
-if sys.argv[1] == "--full":
-    generate_everything_anew()
-elif sys.argv[1] == "--regenerate":
-    regenerate_bot_planets()
+if len(sys.argv) == 2:
+    if sys.argv[1] == "--full":
+        generate_everything_anew()
+    elif sys.argv[1] == "--regenerate":
+        regenerate_bot_planets()
+else:
+    pass 
 
 cursor.close()                 
 cnx.commit()
