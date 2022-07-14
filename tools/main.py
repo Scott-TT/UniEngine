@@ -36,15 +36,13 @@ def generate_everything_anew():
 
 # Updates existing bot planets, without altering overall galaxy state
 def regenerate_bot_planets():
-    galaxy_gen = populate_planets.PopulatePlanets( cursor
-                                                  ,populate_planets.retrieve_existing_planets_coordinates(cursor=cursor, only_bots=True)
-                                                  )
+    generate_all_players()
+    galaxy_gen = populate_planets.PopulatePlanets( cursor )
     galaxy_gen.populate_planets(in_place=True)
 
-if False:
-    generate_everything_anew()
-if True:
-    regenerate_bot_planets()
+
+#generate_everything_anew()
+regenerate_bot_planets()
 
 cursor.close()                 
 cnx.commit()
