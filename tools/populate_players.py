@@ -22,7 +22,7 @@ class PopulatePlayers():
                      ,"email": "bot@localhost"
                      ,"email_2": "nobot@localhost"
                      ,"isAI": 1
-                     ,"avatar": "todo ?"
+                     ,"avatar": ""
                      ,"user_lastip": "localhost"
                      ,"ip_at_reg": "localhost"
                      ,"user_agent": "bot"

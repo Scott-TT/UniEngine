@@ -36,7 +36,7 @@ class ZenMaster(FleetScaling):
                 continue
             quantity = math.floor(total_value_per_item / v.juice)
             if quantity > 0:
-                planet.parameters[k] = quantity
+                planet[k] = quantity
 
 class RatioBalance(FleetScaling):
     def __init__(self, balance_by_budget=False, description=None, ratios={}, multiplier=None):
@@ -60,7 +60,7 @@ class RatioBalance(FleetScaling):
                 ship_cost = v.simplified_cost()
                 quantity = math.floor(ship_ratio * available_budget / ship_cost * random.gauss(100,10)/100)
                 if quantity > 0:
-                    planet.parameters[k] = quantity
+                    planet[k] = quantity
         else:
             # Item balance means we want twice as many of item X as we do item Y, regardless of their relative costs
             sum_item_values = sum( [ self.ratios[k] * v.simplified_cost() for k,v in fleets.items()] )
@@ -68,7 +68,7 @@ class RatioBalance(FleetScaling):
                 k_budget_ratio = self.ratios[k] * v.simplified_cost() / sum_item_values
                 quantity = math.floor(k_budget_ratio * available_budget / v.simplified_cost() * random.gauss(100,10)/100)
                 if quantity > 0:
-                    planet.parameters[k] = quantity
+                    planet[k] = quantity
 
 class Transporter(RatioBalance):
     def __init__(self, multiplier=None):

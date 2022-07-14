@@ -12,7 +12,7 @@ import player_scaling
 
 class Planet:
 
-    def __init__(self, galaxy, system, planet, owner_id=None, empty_shell=True):
+    def __init__(self, galaxy, system, planet, owner_id=None, empty_shell=False):
         self.parameters = {
             "Name" : randomname.get_name()
             ,"galaxy" : galaxy

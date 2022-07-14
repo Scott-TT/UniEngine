@@ -58,18 +58,18 @@ class PopulatePlanets():
         self.cursor.execute(sql)
         sql="DELETE FROM _galaxy WHERE id_planet NOT IN (SELECT id from _planets)"
         self.cursor.execute(sql)
-  
-    def populate_planets(self, in_place=True):
+
+    def create_planets(self):
+        for (g,s,p) in [ (g,s,p) for g in range(1,10) for s in range(1,500) for p in range(1,16) ]:
+            if self.planet_probability_expression(g,s,p):
+                self.insert_planet(Planet(galaxy=g, system=s, planet=p))
+
+    def populate_planets(self, in_place=True, remove_existing=False):
         if in_place == False:
-            self.delete_bots_planets()
-        for i in range(1,10):
-            for i in range(1,500):
-                for i in range(1,16):
-                    if in_place == False:
-                        if self.planet_probability_expression(galaxy, system, i):
-                            p = Planet(galaxy=galaxy, system=system, planet=i)
-                            self.insert_planet(p)
-                    else:
-                        p = Planet(galaxy=galaxy, system=system, planet=i)
-                        self.upsert_planet(p)
+            if remove_existing == True:
+                self.delete_bots_planets()
+            self.create_planets()
+        else:
+            for (g,s,p) in self.existing_planets:
+                self.upsert_planet(Planet(galaxy=g, system=s, planet=p))
 

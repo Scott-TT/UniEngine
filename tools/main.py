@@ -28,23 +28,23 @@ def generate_all_planets():
     galaxy_gen = populate_planets.PopulatePlanets( cursor
                                                   ,planet_probability_expression=(lambda g,s,p: random.randint(0,100) < 42)
                                                   )
-    galaxy_gen.populate_everything(depopulate_clause="WHERE id_owner NOT IN (SELECT id FROM _users WHERE isAI=0)")
+    galaxy_gen.populate_planets(in_place=False, remove_existing=True)
 
-def generate_everything():
+def generate_everything_anew():
     generate_all_players()
     generate_all_planets()
 
 # Updates existing bot planets, without altering overall galaxy state
-def regenerate_planets():
+def regenerate_bot_planets():
     galaxy_gen = populate_planets.PopulatePlanets( cursor
                                                   ,populate_planets.retrieve_existing_planets_coordinates(cursor=cursor, only_bots=True)
                                                   )
+    galaxy_gen.populate_planets(in_place=True)
 
 if False:
-    generate_everything()
-
-if False:
-    regenerate_planets()
+    generate_everything_anew()
+if True:
+    regenerate_bot_planets()
 
 cursor.close()                 
 cnx.commit()

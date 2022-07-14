@@ -7,12 +7,13 @@ import planet_item
 def get_random_profile():
     return random.choice(defensers_profiles)
 
-defensers_profile = []
-
 class DefenseScaling:
     def __init__(self, description=None, multiplier=None):
         self.description=description
         self.multiplier = multiplier if multiplier is not None else 1
+        # Random chance that the defender has been neglecting his defenses
+        if random.random() < 0.1:
+            self.multiplier *= 0.4
 
     def get_available_budget(self, juice):
         return math.floor(self.multiplier * juice)
@@ -73,7 +74,7 @@ class RatioBalance(DefenseScaling):
                 if v.maximum_quantity:
                     quantity = min(v.maximum_quantity,quantity)
                 if quantity > 0:
-                    planet.parameters[k] = quantity
+                    planet[k] = quantity
                 
 class RocketMan(RatioBalance):
     def __init__(self, multiplier=None):
@@ -215,16 +216,6 @@ class OneTrickPony(RatioBalance):
                 break
         RatioBalance.__init__(self, multiplier=multiplier, ratios=ratios)
 
-class RandomArrogance(RatioBalance):
-    def __init__(self, arrogance_multiplier):
-        self.arrogance = min(1,max(0,arrogance_multiplier))
-
-    def fill_defenses(self, planet, juice):
-        actual_profile = random.choice(defensers_profile)
-        actual_profile.multiplier = self.multiplier
-        actual_profile.fill_defenses(planet, juice)
-
-
 defensers_profiles = [ RocketMan()          # Only rockets
                       ,FodderLover()        # Rockets and light lasers
                       ,FodderHeavy()        # Rockets and light lasers covering some big guns
@@ -236,6 +227,5 @@ defensers_profiles = [ RocketMan()          # Only rockets
                       ,AntiRip()            # Specialized against deathstars
                       ,AntiBattleships()    # Specialized against battleships
                       ,OneTrickPony()       # Picks a random defense and mostly sticks to it
-                      ,RandomArrogance(0.4) # Neglects defense : only gets 40% of budget
                      ]
 
