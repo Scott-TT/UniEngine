@@ -5,8 +5,11 @@ from pprint import pprint
 import planet_item
 
 def get_random_profile():
-    if random.random() < 0.3:
+    r = random.random()
+    if r < 0.2:
         return ZenMaster()
+    elif r < 0.35:
+        return MadMan()
     return random.choice(fleet_profiles)
 
 class FleetScaling:
@@ -33,7 +36,7 @@ class ZenMaster(FleetScaling):
                 continue
             quantity = math.floor(total_value_per_item / v.juice)
             if quantity > 0:
-                planet[k] = quantity
+                planet.parameters[k] = quantity
 
 class RatioBalance(FleetScaling):
     def __init__(self, balance_by_budget=False, description=None, ratios={}, multiplier=None):
@@ -134,11 +137,22 @@ class OneTrick(RatioBalance):
         trick = random.choice(["battleship","battlecruiser","bomber","destroyer","deathstar"])
         RatioBalance.__init__(self, multiplier=multiplier, ratios={trick:1})
 
+class MadMan(RatioBalance):
+    def fill_defenses(self, planet, juice):
+        ratios={}
+        candidates = [ random.choice(list(planet_item.fleets)) ] # Enforce at least one element
+        candidates += [ k for k,v in planet_item.fleets.items() if random.random() < 0.15 ]
+        print("Candidates : "+str(candidates))
+        ratios = { k:random.randint(1,100) for k in candidates }
+        actual_profile = RatioBalance(ratios=ratios, balance_by_budget=bool(random.getrandbits(1)))
+        actual_profile.fill_fleets(planet, juice)
 
-fleet_profiles = [ ZenMaster()
-                  ,Transporter()        # Non-combat fleet, mostly transporters
+
+fleet_profiles = [ ZenMaster()                        # Each item gets the same budget
+                  ,MadMan()                           # Content is random, but strongly biased against balance
+                  ,Transporter(multiplier=0.3)        # Non-combat fleet, mostly transporters
                   ,LightFighters()
                   ,CruiseMode()
                   ,OneTrick()
-                  ,GreenWarrior()       # Non-combat fleet, mostly recyclers
+                  ,GreenWarrior(multiplier=0.2)       # Non-combat fleet, mostly recyclers
                  ]

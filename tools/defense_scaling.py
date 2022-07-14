@@ -41,9 +41,10 @@ class ZenMaster(DefenseScaling):
                 planet[k] = quantity
 
 class RatioBalance(DefenseScaling):
-    def __init__(self, name="Ratio-based", description=None, ratios={}, multiplier=None):
+    def __init__(self, name="Ratio-based", balance_by_budget=False, description=None, ratios={}, multiplier=None):
         DefenseScaling.__init__(self, description=description, multiplier=multiplier)
         self.ratios = ratios
+        self.balance_by_budget = balance_by_budget
         
     def fill_defenses(self, planet, juice):
         available_budget = self.get_available_budget(juice)
@@ -54,12 +55,25 @@ class RatioBalance(DefenseScaling):
         total_weights = sum([ self.ratios[k] for k,v in defense_buildings.items() if v.maximum_quantity is None])
         if total_weights == 0:
             return
-        for k,v in defense_buildings.items():
-            quantity = math.floor((self.ratios[k]/total_weights) * available_budget/v.simplified_cost() * random.gauss(100,10)/100)
-            if v.maximum_quantity:
-                quantity = min(v.maximum_quantity,quantity)
-            if quantity > 0:
-                planet[k] = quantity
+        if self.balance_by_budget:
+            # Budget balance means that the ratio applies to budget (X gets half the budget of item Y)
+            for k,v in defense_buildings.items():
+                quantity = math.floor((self.ratios[k]/total_weights) * available_budget/v.simplified_cost() * random.gauss(100,10)/100)
+                if v.maximum_quantity:
+                    quantity = min(v.maximum_quantity,quantity)
+                if quantity > 0:
+                    planet[k] = quantity
+        else:
+            # Item balance means we want twice as many of item X as we do item Y, regardless of their relative costs
+            sum_item_values = sum( [ self.ratios[k] * v.simplified_cost() for k,v in defense_buildings.items() if v.maximum_quantity is None] )
+            sum_item_values += sum([ min(v.maximum_quantity,self.ratios[k]) * v.simplified_cost() for k,v in defense_buildings.items() if v.maximum_quantity is not None] )
+            for k,v in defense_buildings.items():
+                k_budget_ratio = self.ratios[k] * v.simplified_cost() / sum_item_values
+                quantity = math.floor(k_budget_ratio * available_budget / v.simplified_cost() * random.gauss(100,10)/100)
+                if v.maximum_quantity:
+                    quantity = min(v.maximum_quantity,quantity)
+                if quantity > 0:
+                    planet.parameters[k] = quantity
                 
 class RocketMan(RatioBalance):
     def __init__(self, multiplier=None):
