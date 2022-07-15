@@ -12,7 +12,7 @@ import player_scaling
 
 class Planet:
 
-    def __init__(self, galaxy, system, planet, owner_id=None, empty_shell=False):
+    def __init__(self, galaxy, system, planet, empty_shell=False):
         self.parameters = {
             "Name" : randomname.get_name()
             ,"galaxy" : galaxy
@@ -32,16 +32,14 @@ class Planet:
             return
         self.init_buildings()
         self.init_resources_values()
-        if owner_id == None:
-            players = player_scaling.PlayerScaling()
-            planet_juice = self.generator.compute_planet_juice(scaling_level=self.scaling_level, planet=self.parameters)
-            new_owner = players.get_suitable_player(target=planet_juice)
-            self.assign_to_player(new_owner.id)
-        else:
-            self.assign_to_player(owner_id)
+        self.init_owner()
+        self.init_fleets_and_defenses()
 
-    def assign_to_player(self, user_id):
-        self.parameters["id_owner"] = user_id
+    def init_owner(self):
+        players = player_scaling.PlayerScaling()
+        planet_juice = self.generator.compute_planet_juice(scaling_level=self.scaling_level, planet=self.parameters)
+        self.owner = players.get_suitable_player(target=planet_juice)
+        self.parameters["id_owner"] = self.owner.id
 
     def init_resources_values(self):
         # Hourly income computation
@@ -63,7 +61,10 @@ class Planet:
         self.parameters["deuterium"] = min(self.parameters["deuterium"], self.parameters["deuterium_max"])
   
     def init_buildings(self):
-        self.parameters = { **self.parameters, **self.generator.generate_planet_buildings(self.scaling_level) }
+        self.parameters = { **self.parameters, **self.generator.generate_planet_production_buildings(self.scaling_level) }
+
+    def init_fleets_and_defenses(self):
+        self.generator.generate_planet_fleets_and_defenses(self.parameters, self.scaling_level, self.owner)
 
     def print_debug (self, display_scaling=False, display_fleet=False, display_defenses=False):
         scale = planet_scaling.PlanetScaling()
@@ -77,13 +78,14 @@ class Planet:
                                                     ,scale.compute_scaling_factor(linear_scaling_level=self.scaling_level, mode="exponential")
                                                     ,f'{scale.compute_planet_juice(self.scaling_level, self.parameters):,}'
                                                    ))
+            print("  overall budget: %s" % f'{self.generator.compute_planet_juice(self.scaling_level, self.parameters):,}')
         if display_fleet:
             print("Ships:")
             pprint(ships)
             cost = 0
             for type, quantity in ships.items():
                 cost += planet_item.fleets[type].total_cost() * quantity
-            print("  Total cost : %s" % f"{cost:,}")
+            print("  Total cost : %s    %f of budget" % (f"{cost:,}",(cost*100/self.generator.compute_planet_juice(self.scaling_level, self.parameters))))
         if display_defenses:
             print("Defenses:")
             pprint(defenses)

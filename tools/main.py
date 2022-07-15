@@ -52,7 +52,9 @@ else:
     count_grox = 0
     for (g,s,p) in [ (g,s,p) for g in range(1,10) for s in [100] for p in [1]]:
         the_planet = planet.Planet(galaxy=g, system=s, planet=p)
+        print()
         print(f"{g},{s}")
+        the_planet.print_debug(display_scaling=True, display_fleet=True)
 
 cursor.close()                 
 cnx.commit()

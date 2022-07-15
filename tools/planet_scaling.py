@@ -22,8 +22,8 @@ class PlanetScaling:
                 ,"production_time_max"          : 24*365*10
                 ,"linear_to_exponential_scaling": (lambda x: x * math.exp(2*(math.pow(x,2)-1)))
                 ,"fleet_on_planet_proba"        : (lambda x: random.randint(0,100) < 50-2*x)
-                ,"fleet_worth_multiplier"       : (lambda  : random.randint(50,100)/100)
-                ,"defenses_worth_multiplier"    : (lambda  : random.randint(40,100)/100)
+                ,"fleet_baseline_multiplier"       : (lambda  : 1)
+                ,"defenses_baseline_multiplier"    : (lambda  : random.gauss(80,10)/100)
             }
 
     def compute_scaling_factor(self, planet=None, linear_scaling_level=None, mode=None):
@@ -70,17 +70,13 @@ class PlanetScaling:
         juice = math.floor(juice)
         return juice
 
-    def compute_static_defenses(self, planet, scaling_level):
-        defense_juice = self.compute_planet_juice(scaling_level, planet) * self.config["defenses_worth_multiplier"]()
+    def compute_static_defenses(self, planet_contents, budget):
         scaler = defense_scaling.get_random_profile()
-        scaler.fill_defenses(planet=planet, juice=defense_juice)
+        scaler.fill_defenses(planet=planet_contents, juice=budget)
 
-    def compute_fleets(self, planet, scaling_level):
-        if not self.config["fleet_on_planet_proba"](scaling_level):
-            return
-        fleet_juice = self.compute_planet_juice(scaling_level, planet) * self.config["fleet_worth_multiplier"]()
+    def compute_fleets(self, planet_contents, budget):
         scaler = fleet_scaling.get_random_profile()
-        scaler.fill_fleets(planet=planet, juice=fleet_juice)
+        scaler.fill_fleets(planet=planet_contents, juice=budget)
 
     def compute_mines_level(self, planet, scaling_level):
         scaling_factor = self.compute_scaling_factor(linear_scaling_level=scaling_level, mode="linear")
@@ -110,11 +106,22 @@ class PlanetScaling:
             blevel = max(0,min(50,blevel))
             planet[storage] = math.floor(blevel)
 
-    def generate_planet_buildings(self, scaling_level):
+    def compute_budgets(self, planet_contents, scaling_level, player=None):
+        total_budget = self.compute_planet_juice(scaling_level, planet_contents)
+        defense_budget = total_budget * self.config["defenses_baseline_multiplier"]()
+        fleet_budget = total_budget * self.config["fleet_baseline_multiplier"]()
+        if player is None and self.config["fleet_on_planet_proba"](scaling_level):
+            fleet_budget += total_budget * random.gauss(70,20)
+        return(defense_budget, fleet_budget)
+
+    def generate_planet_fleets_and_defenses(self, planet_contents, scaling_level, player):
+        (defense_budget, fleet_budget) = self.compute_budgets(planet_contents=planet_contents, scaling_level=scaling_level, player=player)
+        fleet_budget = fleet_budget * player.get_fleet_multiplier()
+        self.compute_static_defenses(planet_contents=planet_contents, budget=defense_budget)
+        self.compute_fleets(planet_contents=planet_contents, budget=fleet_budget)
+        
+    def generate_planet_production_buildings(self, scaling_level):
         planet = {}
         self.compute_mines_level(planet=planet, scaling_level=scaling_level)
         self.compute_storage_level(planet=planet, scaling_level=scaling_level)
-        self.compute_static_defenses(planet=planet, scaling_level=scaling_level)
-        self.compute_fleets(planet=planet, scaling_level=scaling_level)
-
         return planet
